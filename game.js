@@ -89,49 +89,35 @@
     }
 
     makeTextures() {
-      // Gemiler yüksek çözünürlüklü procedurally drawn Phaser textures; harici resim gerektirmez.
       const drawShip = (key, palette, variant=0) => {
         const g = this.make.graphics({x:0,y:0,add:false});
-        // soft sea shadow
         g.fillStyle(0x00121a,0.28); g.fillEllipse(82,91,110,160);
-        // wake foam
         g.fillStyle(0xb8e6e9,0.34); g.fillEllipse(82,116,52,62);
-        // hull silhouette (bow points upward)
         g.fillStyle(palette.hull,1);
         g.beginPath(); g.moveTo(82,8); g.lineTo(111,38); g.lineTo(119,77);
         g.lineTo(107,118); g.lineTo(82,151); g.lineTo(57,118); g.lineTo(45,77); g.lineTo(53,38); g.closePath(); g.fillPath();
-        // gold / metal outer trim
         g.lineStyle(4,palette.trim,1); g.beginPath(); g.moveTo(82,10); g.lineTo(111,39); g.lineTo(119,77); g.lineTo(107,118); g.lineTo(82,151); g.lineTo(57,118); g.lineTo(45,77); g.lineTo(53,39); g.closePath(); g.strokePath();
-        // hull planks
         g.lineStyle(1.5,palette.plank,.92);
         for(let y=43;y<119;y+=9){ const half=16+Math.sin((y-35)/82*Math.PI)*19; g.beginPath(); g.moveTo(82-half,y); g.lineTo(82+half,y); g.strokePath(); }
-        // deck
         g.fillStyle(palette.deck,1); g.fillRoundedRect(62,37,40,78,10);
         g.lineStyle(1.5,palette.trim,.85); g.strokeRoundedRect(62,37,40,78,10);
-        // deck boards
         g.lineStyle(1,0xf5d8a0,.32);
         for(let y=44;y<110;y+=8){ g.beginPath();g.moveTo(65,y);g.lineTo(99,y);g.strokePath(); }
-        // cannons along both sides
         for(let y of [55,72,89,106]){
-          g.fillStyle(0x111827,1); g.fillCircle(53+(y%2?0:0),y,4); g.fillCircle(111,y,4);
+          g.fillStyle(0x111827,1); g.fillCircle(53,y,4); g.fillCircle(111,y,4);
           g.fillStyle(0x64748b,1); g.fillCircle(53,y,2); g.fillCircle(111,y,2);
         }
-        // crossbeams and masts
         g.lineStyle(4,0x3b2418,1); g.beginPath();g.moveTo(49,54);g.lineTo(115,54);g.moveTo(44,83);g.lineTo(120,83);g.moveTo(53,108);g.lineTo(111,108);g.strokePath();
         g.fillStyle(0xe8d7b4,1); g.fillCircle(82,45,4);g.fillCircle(82,74,4);g.fillCircle(82,101,4);
-        // three fabric sails with layered panels
         const sail = (cx,cy,w,h) => {
           g.fillStyle(palette.sail,1); g.beginPath();g.moveTo(cx-w/2,cy-h/2);g.lineTo(cx+w/2,cy-h/2+3);g.lineTo(cx+w/2-3,cy+h/2-5);g.lineTo(cx,cy+h/2+4);g.lineTo(cx-w/2+3,cy+h/2-5);g.closePath();g.fillPath();
           g.lineStyle(1.4,palette.sailEdge,.9);g.beginPath();g.moveTo(cx-w/2,cy-h/2);g.lineTo(cx-w/2+3,cy+h/2-5);g.lineTo(cx,cy+h/2+4);g.lineTo(cx+w/2-3,cy+h/2-5);g.lineTo(cx+w/2,cy-h/2+3);g.strokePath();
           g.lineStyle(1,0xffffff,.18);for(let x=-w/3;x<w/2;x+=w/3){g.beginPath();g.moveTo(cx+x,cy-h/2+3);g.lineTo(cx+x*.75,cy+h/2-4);g.strokePath();}
-          // heraldic emblem
           g.fillStyle(palette.emblem,.9);g.fillCircle(cx,cy,4);g.fillTriangle(cx-5,cy+4,cx+5,cy+4,cx,cy+10);
         };
         sail(82,25,28,29); sail(82,60,39,39); sail(82,94,32,28);
-        // bowsprit and flag
         g.lineStyle(3,0x5a3925,1);g.beginPath();g.moveTo(82,16);g.lineTo(82,-2);g.strokePath();
         g.fillStyle(palette.flag,1);g.fillTriangle(83,0,102,5,83,12);
-        // variant details
         if(variant===1){ g.fillStyle(0xff5a1f,.7);g.fillTriangle(82,8,94,29,82,24);g.fillTriangle(82,8,70,29,82,24); }
         if(variant===2){ g.lineStyle(3,0x34d399,.85);g.strokeCircle(82,78,22);g.fillStyle(0x34d399,.75);g.fillTriangle(82,66,72,82,82,78);g.fillTriangle(82,66,92,82,82,78); }
         g.generateTexture(key,164,164); g.destroy();
@@ -139,7 +125,7 @@
       drawShip('ship-player',{hull:0x442318,deck:0x98602f,trim:0xf5c76e,plank:0x25160f,sail:0x9b2635,sailEdge:0xf4b8a2,emblem:0xffd783,flag:0x8f1d2c});
       drawShip('ship-enemy',{hull:0x202b36,deck:0x465260,trim:0x8ce6dd,plank:0x0c1720,sail:0x087e83,sailEdge:0x7bf3e8,emblem:0xc5fff6,flag:0x0d9488},2);
       drawShip('ship-boss',{hull:0x1d1013,deck:0x4b2020,trim:0xff7b32,plank:0x12090b,sail:0x651b27,sailEdge:0xffa15c,emblem:0xffd783,flag:0xb91c1c},1);
-      // Treasure chest icon
+      
       const chest=this.make.graphics({x:0,y:0,add:false});
       chest.fillStyle(0x5b2e12,1);chest.fillRoundedRect(4,10,26,20,4);
       chest.fillStyle(0xdba43b,1);chest.fillRect(4,16,26,4);chest.fillRect(15,10,4,20);
@@ -150,7 +136,6 @@
       const bg=this.add.graphics().setDepth(-20);
       bg.fillGradientStyle(0x0a5368,0x0b6575,0x073447,0x082c3b,1);
       bg.fillRect(-2200,-2200,4400,4400);
-      // subtly irregular wave lines, distributed across the world
       let seed=9137; const rand=()=>{seed=(seed*1664525+1013904223)>>>0;return seed/4294967296;};
       for(let i=0;i<820;i++){
         const x=(rand()-.5)*4100,y=(rand()-.5)*4100;
@@ -158,12 +143,10 @@
         bg.lineStyle(.8+rand()*1.6, rand()>.5?0x8ad9df:0x031d2b,.08+rand()*.14);
         bg.beginPath();bg.moveTo(x,y);bg.lineTo(x+len*.5,y+curve);bg.lineTo(x+len,y+Math.sin(curve)*2);bg.strokePath();
       }
-      // distant mist glows
       for(let i=0;i<36;i++){
         const x=(rand()-.5)*3300,y=(rand()-.5)*3300;
         bg.fillStyle(i%2?0x4bb8b8:0x092f40,.035);bg.fillCircle(x,y,60+rand()*150);
       }
-      // shore islands
       for(let i=0;i<14;i++){
         const x=(rand()-.5)*3000,y=(rand()-.5)*3000,r=45+rand()*65;
         if(Math.hypot(x,y)<230) continue;
@@ -231,7 +214,6 @@
       if(Phaser.Math.Distance.Between(this.player.x,this.player.y,target.x,target.y)>340) { gameState.attacking=false; updateHUD(); toast('Hedef çok uzakta'); return; }
       gameState.ammo--; updateHUD();
       this.fireShot(this.player,target,true);
-      // short cannon flash at ship side
       this.particleBurst(this.player.x+Phaser.Math.Between(-22,22),this.player.y+Phaser.Math.Between(-20,20),'#ff9b45',5);
       if(gameState.ammo<=0) { gameState.attacking=false; updateHUD(); toast('Gülle bitti!'); }
     }
@@ -248,7 +230,6 @@
     update(_time,delta) {
       if(!this.player || !gameState.started) return;
       const dt=Math.min(delta,40)/1000;
-      // Smooth acceleration and turning toward tapped destination
       const p=this.player;
       if(p.targetPoint){
         const dx=p.targetPoint.x-p.x,dy=p.targetPoint.y-p.y,dist=Math.hypot(dx,dy);
@@ -265,7 +246,6 @@
         } else { p.targetPoint=null; }
       } else { p.speed=Phaser.Math.Linear(p.speed,0,.8*dt); }
 
-      // Enemy pursuit and occasional return fire
       for(const e of this.enemies){
         if(!e.active) continue;
         const dx=p.x-e.x,dy=p.y-e.y,dist=Math.hypot(dx,dy);
@@ -285,7 +265,7 @@
         e.hpGraphic.fillStyle(0x071721,.8);e.hpGraphic.fillRoundedRect(e.x-25,e.y+48,50,5,2);
         e.hpGraphic.fillStyle(0xef4444,1);e.hpGraphic.fillRoundedRect(e.x-25,e.y+48,50*Math.max(0,e.hp/e.maxHp),5,2);
       }
-      // Projectiles hit their target
+
       for(let i=this.shots.length-1;i>=0;i--){
         const s=this.shots[i]; if(!s.active){this.shots.splice(i,1);continue;}
         s.x+=s.vx*dt;s.y+=s.vy*dt;s.life-=dt;
@@ -313,7 +293,7 @@
           s.destroy();this.shots.splice(i,1);
         }
       }
-      // Treasure pickup
+
       for(let i=this.treasures.length-1;i>=0;i--){
         const t=this.treasures[i];t.y+=Math.sin(this.time.now/350+t.phase)*.15;
         if(Phaser.Math.Distance.Between(p.x,p.y,t.x,t.y)<43){
