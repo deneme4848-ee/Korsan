@@ -5,7 +5,68 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
   <meta name="theme-color" content="#061d2b">
   <title>Korsan Dünyası — Phaser Prototip</title>
-  <link rel="stylesheet" href="style.css">
+  <style>
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html, body { margin:0; width:100%; height:100%; overflow:hidden; background:#061d2b; color:#fff; font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; touch-action:none; }
+
+    #game { 
+      position: fixed; 
+      top: 0; 
+      left: 0; 
+      width: 100vw; 
+      height: 100vh; 
+      z-index: 0; 
+    }
+
+    #game canvas { 
+      display: block; 
+      width: 100% !important; 
+      height: 100% !important; 
+    }
+
+    #hud { position:fixed; inset: max(10px, env(safe-area-inset-top)) 10px auto 10px; display:flex; justify-content:space-between; align-items:flex-start; gap:8px; pointer-events:none; z-index:5; }
+    .panel { background:linear-gradient(145deg,rgba(5,26,39,.91),rgba(9,44,58,.78)); border:1px solid rgba(255,215,131,.38); box-shadow:0 8px 24px #00111c66; border-radius:13px; padding:10px 12px; backdrop-filter:blur(7px); pointer-events: auto; }
+    .stats { width:min(245px, 60vw); }
+    .brand { color:#ffd783; font-weight:900; font-size:12px; letter-spacing:.5px; margin-bottom:7px; }
+    .tag { font-size:8px; border:1px solid #c58a3b; border-radius:5px; padding:2px 4px; margin-left:4px; color:#f5c97d; }
+    .row { display:flex; gap:7px; align-items:center; justify-content:space-between; font-size:11px; margin-top:4px; color:#cbd5e1; }
+    .row strong { color:#fff4d4; font-variant-numeric:tabular-nums; }
+    .bar { height:6px; background:#ffffff24; border-radius:8px; overflow:hidden; margin-top:4px; }
+    #hpBar { height:100%; width:100%; background:linear-gradient(90deg,#22c55e,#86efac); transition:width .15s; }
+    .bar.exp { height:4px; }
+    #expBar { height:100%; width:0; background:linear-gradient(90deg,#38bdf8,#a78bfa); }
+    .mini-info { max-width:190px; font-size:11px; color:#ffe8b1; }
+    .small { color:#b8d0dc; margin-top:4px; font-size:10px; }
+    #controls { position:fixed; left:0; right:0; bottom:max(14px,env(safe-area-inset-bottom)); z-index:6; display:flex; justify-content:center; align-items:center; gap:9px; padding:0 12px; pointer-events:none; }
+    button { font:inherit; touch-action:manipulation; cursor:pointer; }
+    .action,.secondary { pointer-events:auto; min-height:46px; border-radius:13px; padding:0 17px; font-weight:900; letter-spacing:.3px; box-shadow:0 5px 16px #00111c99; }
+    .action { border:1px solid #ffdf9a; color:#fff7e6; background:linear-gradient(#c34c27,#792514); }
+    .action:disabled { opacity:.4; filter:grayscale(.7); }
+    .action:not(:disabled):active,.secondary:active { transform:scale(.97); }
+    .secondary { border:1px solid #9cc2cf77; color:#e4f5f8; background:linear-gradient(#19485b,#0b2d3c); }
+    #toast { position:fixed; left:50%; top:42%; transform:translate(-50%,-50%); z-index:9; pointer-events:none; opacity:0; background:#061d2bee; border:1px solid #ffd783; border-radius:10px; padding:10px 14px; color:#ffe8b1; font-size:13px; font-weight:800; transition:opacity .18s; text-align:center; max-width:80vw; }
+    #toast.show { opacity:1; }
+    .overlay { position:fixed; inset:0; z-index:20; display:flex; justify-content:center; align-items:center; padding:18px; background:radial-gradient(circle at 50% 30%,#0b5367eF,#03131ef7 75%); }
+    .modal { width:min(420px,100%); padding:25px 22px; text-align:center; border-radius:22px; border:1px solid #f4c66c88; background:linear-gradient(155deg,#0a3042,#041722); box-shadow:0 20px 60px #0009; }
+    .emblem { width:58px; height:58px; margin:0 auto 8px; border-radius:50%; display:grid; place-items:center; font-size:30px; color:#ffdf9a; background:#8d321e; border:2px solid #ffd783; }
+    h1 { margin:5px 0 8px; color:#ffdc92; font-size:26px; }
+    .modal p { color:#c0d5de; font-size:13px; line-height:1.45; }
+    label { display:block; text-align:left; font-size:12px; color:#d5e7ee; margin:18px 0 5px; }
+    input { width:100%; height:44px; border-radius:10px; border:1px solid #547483; padding:0 12px; background:#061d2b; color:white; font-size:16px; outline:none; }
+    input:focus { border-color:#ffd783; }
+    .wide { width:100%; margin-top:12px; min-height:48px; }
+    .note { font-size:11px!important; color:#91aeb9!important; margin-bottom:0; }
+    @media (max-width:520px) {
+      #hud { inset: max(7px,env(safe-area-inset-top)) 7px auto 7px; gap:5px; }
+      .stats { width: min(218px, 59vw); padding:8px 9px; }
+      .brand { font-size:10px; margin-bottom:5px; }
+      .row { font-size:10px; gap:4px; }
+      .mini-info { padding:8px; max-width:38vw; font-size:10px; }
+      .small { font-size:9px; }
+      #controls { gap:6px; bottom:max(10px,env(safe-area-inset-bottom)); }
+      .action,.secondary { min-height:43px; padding:0 11px; font-size:11px; }
+    }
+  </style>
 </head>
 <body>
   <!-- Phaser canvas'ının yerleşeceği ana alan -->
@@ -45,7 +106,355 @@
       <p class="note">Bu sürüm tek cihazda çalışan bir prototiptir. Gerçek çevrim içi çok oyunculu sistem henüz ekli değildir.</p>
     </div>
   </div>
+
+  <!-- Phaser Kütüphanesi -->
   <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
-  <script src="game.js"></script>
+  
+  <!-- Oyun Mantığı -->
+  <script>
+    /* Korsan Dünyası — Phaser 3 üstten görünüm prototipi */
+    (() => {
+      const $ = id => document.getElementById(id);
+      const ui = {
+        captain: $('captain'), gold: $('gold'), ammo: $('ammo'), hpText: $('hpText'),
+        hpBar: $('hpBar'), level: $('level'), expText: $('expText'), expBar: $('expBar'),
+        targetInfo: $('targetInfo'), attack: $('attackBtn'), repair: $('repairBtn'),
+        reset: $('resetBtn'), toast: $('toast'), intro: $('intro'),
+        captainInput: $('captainInput'), start: $('startBtn')
+      };
+
+      const gameState = { started:false, captain:'Kaptan', gold:100, ammo:25, hp:1000, maxHp:1000, level:1, exp:0, maxExp:100, selected:null, attacking:false };
+      let sceneRef;
+
+      function toast(message) {
+        ui.toast.textContent = message;
+        ui.toast.classList.add('show');
+        clearTimeout(toast.timer);
+        toast.timer = setTimeout(() => ui.toast.classList.remove('show'), 1700);
+      }
+      function updateHUD() {
+        ui.captain.textContent = gameState.captain;
+        ui.gold.textContent = gameState.gold.toLocaleString('tr-TR');
+        ui.ammo.textContent = gameState.ammo;
+        ui.hpText.textContent = `${Math.ceil(gameState.hp)} / ${gameState.maxHp}`;
+        ui.hpBar.style.width = `${Math.max(0, gameState.hp / gameState.maxHp * 100)}%`;
+        ui.hpBar.style.background = gameState.hp < 250 ? 'linear-gradient(90deg,#dc2626,#fb7185)' : 'linear-gradient(90deg,#22c55e,#86efac)';
+        ui.level.textContent = gameState.level;
+        ui.expText.textContent = `${gameState.exp} / ${gameState.maxExp}`;
+        ui.expBar.style.width = `${gameState.exp / gameState.maxExp * 100}%`;
+        const target = sceneRef?.enemies?.find(e => e === gameState.selected && e.active);
+        ui.targetInfo.textContent = target ? `Hedef: ${target.shipName} · ${Math.max(0,Math.ceil(target.hp))} can` : 'Hedef: yok';
+        ui.attack.disabled = !target || gameState.ammo <= 0;
+        ui.attack.textContent = gameState.attacking ? '⏹ ATIŞI KES' : '⚔ SALDIR';
+      }
+
+      function addExp(amount) {
+        gameState.exp += amount;
+        while (gameState.exp >= gameState.maxExp) {
+          gameState.exp -= gameState.maxExp;
+          gameState.level++;
+          gameState.maxExp = Math.round(gameState.maxExp * 1.35);
+          gameState.maxHp += 100;
+          gameState.hp = gameState.maxHp;
+          if (sceneRef) sceneRef.floatText(sceneRef.player.x, sceneRef.player.y - 50, `SEVİYE ${gameState.level}!`, '#7dd3fc');
+        }
+        updateHUD();
+      }
+
+      class OceanScene extends Phaser.Scene {
+        constructor() { super('OceanScene'); this.enemies=[]; this.shots=[]; this.particles=[]; this.wakes=[]; this.treasures=[]; this.islands=[]; }
+        create() {
+          sceneRef = this;
+          this.cameras.main.setBackgroundColor('#0b5367');
+          
+          this.makeTextures();
+          this.drawOcean();
+          
+          this.player = this.add.image(0,0,'ship-player').setDepth(5).setScale(1.05);
+          this.player.rotation = -Math.PI/2;
+          this.player.hp = gameState.hp;
+          this.player.speed = 0;
+          this.player.targetPoint = null;
+
+          this.createWorld();
+          this.spawnTreasure(); this.spawnTreasure(); this.spawnTreasure();
+
+          this.physics.world.setBounds(-1800,-1800,3600,3600);
+          this.cameras.main.startFollow(this.player, true, 0.08, 0.08);
+          this.cameras.main.setZoom(Math.min(1.0, Math.max(.72, window.innerWidth / 850)));
+          this.cameras.main.setBounds(-1800,-1800,3600,3600);
+          
+          this.input.on('pointerdown', pointer => {
+            if (!gameState.started || $('intro').style.display !== 'none') return;
+            const world = pointer.positionToCamera(this.cameras.main);
+            const clicked = this.enemies.find(e => Phaser.Math.Distance.Between(world.x,world.y,e.x,e.y) < 52);
+            if (clicked) {
+              gameState.selected = clicked;
+              this.enemies.forEach(e => e.setAlpha(e === clicked ? 1 : .94));
+              this.drawSelection(clicked);
+              updateHUD();
+              toast(`${clicked.shipName} hedef seçildi`);
+            } else {
+              this.player.targetPoint = new Phaser.Math.Vector2(world.x,world.y);
+            }
+          });
+          this.input.on('gameobjectdown', (_pointer, object) => { if (object && object.isEnemyShip) { gameState.selected = object; updateHUD(); } });
+          this.time.addEvent({ delay:2600, loop:true, callback:() => { if (this.enemies.filter(e=>e.active).length < 5) this.spawnEnemy(); } });
+          this.time.addEvent({ delay:170, loop:true, callback:() => { if (gameState.started && gameState.attacking) this.firePlayerShot(); } });
+          this.time.addEvent({ delay:2400, loop:true, callback:() => this.spawnTreasure() });
+          this.scale.on('resize', () => this.cameras.main.setZoom(Math.min(1.0, Math.max(.72, window.innerWidth / 850))));
+        }
+
+        makeTextures() {
+          const drawShip = (key, palette, variant=0) => {
+            const g = this.make.graphics({x:0,y:0,add:false});
+            g.fillStyle(0x00121a,0.28); g.fillEllipse(82,91,110,160);
+            g.fillStyle(0xb8e6e9,0.34); g.fillEllipse(82,116,52,62);
+            g.fillStyle(palette.hull,1);
+            g.beginPath(); g.moveTo(82,8); g.lineTo(111,38); g.lineTo(119,77);
+            g.lineTo(107,118); g.lineTo(82,151); g.lineTo(57,118); g.lineTo(45,77); g.lineTo(53,38); g.closePath(); g.fillPath();
+            g.lineStyle(4,palette.trim,1); g.beginPath(); g.moveTo(82,10); g.lineTo(111,39); g.lineTo(119,77); g.lineTo(107,118); g.lineTo(82,151); g.lineTo(57,118); g.lineTo(45,77); g.lineTo(53,39); g.closePath(); g.strokePath();
+            g.lineStyle(1.5,palette.plank,.92);
+            for(let y=43;y<119;y+=9){ const half=16+Math.sin((y-35)/82*Math.PI)*19; g.beginPath(); g.moveTo(82-half,y); g.lineTo(82+half,y); g.strokePath(); }
+            g.fillStyle(palette.deck,1); g.fillRoundedRect(62,37,40,78,10);
+            g.lineStyle(1.5,palette.trim,.85); g.strokeRoundedRect(62,37,40,78,10);
+            g.lineStyle(1,0xf5d8a0,.32);
+            for(let y=44;y<110;y+=8){ g.beginPath();g.moveTo(65,y);g.lineTo(99,y);g.strokePath(); }
+            for(let y of [55,72,89,106]){
+              g.fillStyle(0x111827,1); g.fillCircle(53,y,4); g.fillCircle(111,y,4);
+              g.fillStyle(0x64748b,1); g.fillCircle(53,y,2); g.fillCircle(111,y,2);
+            }
+            g.lineStyle(4,0x3b2418,1); g.beginPath();g.moveTo(49,54);g.lineTo(115,54);g.moveTo(44,83);g.lineTo(120,83);g.moveTo(53,108);g.lineTo(111,108);g.strokePath();
+            g.fillStyle(0xe8d7b4,1); g.fillCircle(82,45,4);g.fillCircle(82,74,4);g.fillCircle(82,101,4);
+            const sail = (cx,cy,w,h) => {
+              g.fillStyle(palette.sail,1); g.beginPath();g.moveTo(cx-w/2,cy-h/2);g.lineTo(cx+w/2,cy-h/2+3);g.lineTo(cx+w/2-3,cy+h/2-5);g.lineTo(cx,cy+h/2+4);g.lineTo(cx-w/2+3,cy+h/2-5);g.closePath();g.fillPath();
+              g.lineStyle(1.4,palette.sailEdge,.9);g.beginPath();g.moveTo(cx-w/2,cy-h/2);g.lineTo(cx-w/2+3,cy+h/2-5);g.lineTo(cx,cy+h/2+4);g.lineTo(cx+w/2-3,cy+h/2-5);g.lineTo(cx+w/2,cy-h/2+3);g.strokePath();
+              g.lineStyle(1,0xffffff,.18);for(let x=-w/3;x<w/2;x+=w/3){g.beginPath();g.moveTo(cx+x,cy-h/2+3);g.lineTo(cx+x*.75,cy+h/2-4);g.strokePath();}
+              g.fillStyle(palette.emblem,.9);g.fillCircle(cx,cy,4);g.fillTriangle(cx-5,cy+4,cx+5,cy+4,cx,cy+10);
+            };
+            sail(82,25,28,29); sail(82,60,39,39); sail(82,94,32,28);
+            g.lineStyle(3,0x5a3925,1);g.beginPath();g.moveTo(82,16);g.lineTo(82,-2);g.strokePath();
+            g.fillStyle(palette.flag,1);g.fillTriangle(83,0,102,5,83,12);
+            if(variant===1){ g.fillStyle(0xff5a1f,.7);g.fillTriangle(82,8,94,29,82,24);g.fillTriangle(82,8,70,29,82,24); }
+            if(variant===2){ g.lineStyle(3,0x34d399,.85);g.strokeCircle(82,78,22);g.fillStyle(0x34d399,.75);g.fillTriangle(82,66,72,82,82,78);g.fillTriangle(82,66,92,82,82,78); }
+            g.generateTexture(key,164,164); g.destroy();
+          };
+          drawShip('ship-player',{hull:0x442318,deck:0x98602f,trim:0xf5c76e,plank:0x25160f,sail:0x9b2635,sailEdge:0xf4b8a2,emblem:0xffd783,flag:0x8f1d2c});
+          drawShip('ship-enemy',{hull:0x202b36,deck:0x465260,trim:0x8ce6dd,plank:0x0c1720,sail:0x087e83,sailEdge:0x7bf3e8,emblem:0xc5fff6,flag:0x0d9488},2);
+          drawShip('ship-boss',{hull:0x1d1013,deck:0x4b2020,trim:0xff7b32,plank:0x12090b,sail:0x651b27,sailEdge:0xffa15c,emblem:0xffd783,flag:0xb91c1c},1);
+          
+          const chest=this.make.graphics({x:0,y:0,add:false});
+          chest.fillStyle(0x5b2e12,1);chest.fillRoundedRect(4,10,26,20,4);
+          chest.fillStyle(0xdba43b,1);chest.fillRect(4,16,26,4);chest.fillRect(15,10,4,20);
+          chest.fillStyle(0xffdf78,1);chest.fillCircle(17,20,3);chest.generateTexture('treasure',34,34);chest.destroy();
+        }
+
+        drawOcean() {
+          const bg=this.add.graphics().setDepth(-20);
+          bg.fillGradientStyle(0x0a5368,0x0b6575,0x073447,0x082c3b,1);
+          bg.fillRect(-2200,-2200,4400,4400);
+          let seed=9137; const rand=()=>{seed=(seed*1664525+1013904223)>>>0;return seed/4294967296;};
+          for(let i=0;i<820;i++){
+            const x=(rand()-.5)*4100,y=(rand()-.5)*4100;
+            const len=18+rand()*70, curve=rand()*8;
+            bg.lineStyle(.8+rand()*1.6, rand()>.5?0x8ad9df:0x031d2b,.08+rand()*.14);
+            bg.beginPath();bg.moveTo(x,y);bg.lineTo(x+len*.5,y+curve);bg.lineTo(x+len,y+Math.sin(curve)*2);bg.strokePath();
+          }
+          for(let i=0;i<36;i++){
+            const x=(rand()-.5)*3300,y=(rand()-.5)*3300;
+            bg.fillStyle(i%2?0x4bb8b8:0x092f40,.035);bg.fillCircle(x,y,60+rand()*150);
+          }
+          for(let i=0;i<14;i++){
+            const x=(rand()-.5)*3000,y=(rand()-.5)*3000,r=45+rand()*65;
+            if(Math.hypot(x,y)<230) continue;
+            const island=this.add.container(x,y).setDepth(-2);
+            const shadow=this.add.ellipse(8,10,r*2.3,r*1.75,0x00131a,.28);
+            const sand=this.add.ellipse(0,0,r*2,r*1.55,0xc6a76a,1);
+            const land=this.add.ellipse(-3,-4,r*1.7,r*1.28,0x4d754c,1);
+            const green=this.add.ellipse(-r*.12,-r*.12,r*1.05,r*.72,0x315c40,.95);
+            const rock=this.add.ellipse(r*.3,-r*.15,r*.45,r*.28,0x8b8875,.9);
+            island.add([shadow,sand,land,green,rock]); island.rotation=rand()*.7;
+            this.islands.push({x,y,r,object:island});
+          }
+        }
+
+        createWorld() {
+          for(let i=0;i<4;i++) this.spawnEnemy(i===0);
+        }
+
+        spawnEnemy(boss=false) {
+          const angle=Math.random()*Math.PI*2, dist=420+Math.random()*420;
+          const x=Phaser.Math.Clamp(this.player.x+Math.cos(angle)*dist,-1550,1550);
+          const y=Phaser.Math.Clamp(this.player.y+Math.sin(angle)*dist,-1550,1550);
+          const obj=this.add.image(x,y,boss?'ship-boss':'ship-enemy').setDepth(4).setScale(boss?1.03:.83);
+          obj.isEnemyShip=true; obj.shipName=boss?'Kızıl Amiral':'Kara Akıncı';
+          obj.hp=boss?900:520; obj.maxHp=obj.hp; obj.speed=boss?36:44; obj.lastShot=0; obj.wander=Math.random()*6.28;
+          obj.hpGraphic=this.add.graphics().setDepth(8);
+          obj.nameText=this.add.text(x,y+64,obj.shipName,{fontFamily:'system-ui',fontSize:'11px',fontStyle:'bold',color:'#fff0cb',stroke:'#04151c',strokeThickness:3}).setOrigin(.5).setDepth(8);
+          obj.setInteractive(new Phaser.Geom.Circle(82,82,52),Phaser.Geom.Circle.Contains);
+          this.enemies.push(obj);
+          return obj;
+        }
+
+        spawnTreasure() {
+          if(this.treasures.length>=6 || !this.player) return;
+          const a=Math.random()*Math.PI*2,d=220+Math.random()*550;
+          const x=Phaser.Math.Clamp(this.player.x+Math.cos(a)*d,-1600,1600);
+          const y=Phaser.Math.Clamp(this.player.y+Math.sin(a)*d,-1600,1600);
+          const t=this.add.image(x,y,'treasure').setDepth(2).setScale(.85);
+          t.phase=Math.random()*6.28; this.treasures.push(t);
+        }
+
+        drawSelection(enemy) {
+          if(this.selectionRing) this.selectionRing.destroy();
+          this.selectionRing=this.add.circle(enemy.x,enemy.y,50,0xffd783,.08).setStrokeStyle(2,0xffd783,.95).setDepth(3);
+        }
+
+        floatText(x,y,text,color='#ffe5a3') {
+          const label=this.add.text(x,y,text,{fontFamily:'system-ui',fontSize:'15px',fontStyle:'bold',color,stroke:'#071721',strokeThickness:4}).setOrigin(.5).setDepth(20);
+          this.tweens.add({targets:label,y:y-34,alpha:0,duration:850,ease:'Cubic.easeOut',onComplete:()=>label.destroy()});
+        }
+
+        particleBurst(x,y,color,count=16) {
+          for(let i=0;i<count;i++){
+            const a=Math.random()*Math.PI*2,s=30+Math.random()*170;
+            const p=this.add.circle(x,y,1.5+Math.random()*3,Phaser.Display.Color.HexStringToColor(color).color,.95).setDepth(15);
+            this.tweens.add({targets:p,x:x+Math.cos(a)*s,y:y+Math.sin(a)*s,alpha:0,scale:.15,duration:300+Math.random()*450,ease:'Cubic.easeOut',onComplete:()=>p.destroy()});
+          }
+          const ring=this.add.circle(x,y,8,0xffffff,0).setStrokeStyle(3,0xffd783,.8).setDepth(14);
+          this.tweens.add({targets:ring,radius:36,alpha:0,duration:420,onComplete:()=>ring.destroy()});
+        }
+
+        firePlayerShot() {
+          const target=gameState.selected;
+          if(!target || !target.active || gameState.ammo<=0) { gameState.attacking=false; updateHUD(); return; }
+          if(Phaser.Math.Distance.Between(this.player.x,this.player.y,target.x,target.y)>340) { gameState.attacking=false; updateHUD(); toast('Hedef çok uzakta'); return; }
+          gameState.ammo--; updateHUD();
+          this.fireShot(this.player,target,true);
+          this.particleBurst(this.player.x+Math.random()*22-11,this.player.y+Math.random()*20-10,'#ff9b45',5);
+          if(gameState.ammo<=0) { gameState.attacking=false; updateHUD(); toast('Gülle bitti!'); }
+        }
+
+        fireShot(from,target,fromPlayer) {
+          const shot=this.add.circle(from.x,from.y,4,fromPlayer?0xffd36b:0xff7b52,1).setStrokeStyle(2,0xfff0b3,.8).setDepth(12);
+          const dx=target.x-from.x,dy=target.y-from.y,len=Math.hypot(dx,dy)||1;
+          shot.vx=dx/len*(fromPlayer?430:280);shot.vy=dy/len*(fromPlayer?430:280);shot.target=target;shot.fromPlayer=fromPlayer;shot.life=1.8;
+          this.shots.push(shot);
+          const trail=this.add.circle(from.x,from.y,2,0xffb35a,.7).setDepth(11);
+          this.tweens.add({targets:trail,alpha:0,scale:3,duration:250,onComplete:()=>trail.destroy()});
+        }
+
+        update(_time,delta) {
+          if(!this.player || !gameState.started) return;
+          const dt=Math.min(delta,40)/1000;
+          const p=this.player;
+          if(p.targetPoint){
+            const dx=p.targetPoint.x-p.x,dy=p.targetPoint.y-p.y,dist=Math.hypot(dx,dy);
+            if(dist>12){
+              const angle=Math.atan2(dy,dx)+Math.PI/2;
+              p.rotation=Phaser.Math.Angle.RotateTo(p.rotation,angle,2.5*dt);
+              p.speed=Phaser.Math.Linear(p.speed,145,Math.min(1,1.5*dt));
+              p.x+=Math.cos(angle-Math.PI/2)*p.speed*dt;
+              p.y+=Math.sin(angle-Math.PI/2)*p.speed*dt;
+              if(Math.random()<.65){
+                const wake=this.add.ellipse(p.x-Math.cos(angle-Math.PI/2)*34,p.y-Math.sin(angle-Math.PI/2)*34,12,25,0xd9f7f4,.22).setRotation(p.rotation).setDepth(1);
+                this.tweens.add({targets:wake,alpha:0,scaleX:1.8,scaleY:1.6,duration:700,onComplete:()=>wake.destroy()});
+              }
+            } else { p.targetPoint=null; }
+          } else { p.speed=Phaser.Math.Linear(p.speed,0,.8*dt); }
+
+          for(const e of this.enemies){
+            if(!e.active) continue;
+            const dx=p.x-e.x,dy=p.y-e.y,dist=Math.hypot(dx,dy);
+            if(dist<520){
+              const angle=Math.atan2(dy,dx)+Math.PI/2;
+              e.rotation=Phaser.Math.Angle.RotateTo(e.rotation,angle,1.1*dt);
+              if(dist>165){e.x+=Math.cos(angle-Math.PI/2)*e.speed*dt;e.y+=Math.sin(angle-Math.PI/2)*e.speed*dt;}
+              if(dist<290 && this.time.now-e.lastShot>2600){
+                e.lastShot=this.time.now;
+                this.fireShot(e,p,false);
+              }
+            } else {
+              e.wander+=dt*.25;e.x+=Math.cos(e.wander)*e.speed*.25*dt;e.y+=Math.sin(e.wander)*e.speed*.25*dt;
+            }
+            e.nameText.setPosition(e.x,e.y+63);
+            e.hpGraphic.clear();
+            e.hpGraphic.fillStyle(0x071721,.8);e.hpGraphic.fillRoundedRect(e.x-25,e.y+48,50,5,2);
+            e.hpGraphic.fillStyle(0xef4444,1);e.hpGraphic.fillRoundedRect(e.x-25,e.y+48,50*Math.max(0,e.hp/e.maxHp),5,2);
+          }
+
+          for(let i=this.shots.length-1;i>=0;i--){
+            const s=this.shots[i]; if(!s.active){this.shots.splice(i,1);continue;}
+            s.x+=s.vx*dt;s.y+=s.vy*dt;s.life-=dt;
+            if(Math.random()<.45){
+              const smoke=this.add.circle(s.x,s.y,1.5,0xe9e5d9,.55).setDepth(10);
+              this.tweens.add({targets:smoke,alpha:0,scale:2,duration:230,onComplete:()=>smoke.destroy()});
+            }
+            const t=s.target;
+            if(!t || !t.active || Phaser.Math.Distance.Between(s.x,s.y,t.x,t.y)<22 || s.life<=0){
+              if(t && t.active && Phaser.Math.Distance.Between(s.x,s.y,t.x,t.y)<40){
+                if(s.fromPlayer){
+                  t.hp-=210;this.floatText(t.x,t.y-36,'−210','#ffdf9a');this.particleBurst(t.x,t.y,'#ff8a45',18);
+                  if(t.hp<=0){
+                    this.particleBurst(t.x,t.y,'#ff542e',30);this.floatText(t.x,t.y-55,'GEMİ BATTI!','#ffd783');
+                    if(gameState.selected===t) gameState.selected=null;
+                    gameState.gold+=50;addExp(35);t.nameText.destroy();t.hpGraphic.destroy();t.destroy();
+                    this.enemies=this.enemies.filter(e=>e.active);gameState.attacking=false;updateHUD();toast('+50 altın');
+                  }
+                } else {
+                  gameState.hp=Math.max(0,gameState.hp-45);this.particleBurst(p.x,p.y,'#ff6b57',9);this.floatText(p.x,p.y-45,'−45 CAN','#ff8a8a');
+                  if(gameState.hp<=0){gameState.hp=gameState.maxHp;gameState.gold=Math.max(0,gameState.gold-25);toast('Gemi ağır hasar aldı; prototipte yeniden toparlandı.');}
+                  updateHUD();
+                }
+              }
+              s.destroy();this.shots.splice(i,1);
+            }
+          }
+
+          for(let i=this.treasures.length-1;i>=0;i--){
+            const t=this.treasures[i];t.y+=Math.sin(this.time.now/350+t.phase)*.15;
+            if(Phaser.Math.Distance.Between(p.x,p.y,t.x,t.y)<43){
+              this.particleBurst(t.x,t.y,'#ffdb65',14);t.destroy();this.treasures.splice(i,1);
+              gameState.gold+=25;addExp(15);updateHUD();toast('+25 altın · +15 EXP');
+            }
+          }
+          if(this.selectionRing && gameState.selected?.active) this.selectionRing.setPosition(gameState.selected.x,gameState.selected.y);
+          updateHUD();
+        }
+      }
+
+      const config = {
+        type: Phaser.AUTO, parent:'game', backgroundColor:'#0b5367',
+        scale:{mode:Phaser.Scale.RESIZE,width:'100%',height:'100%'},
+        render:{antialias:true, roundPixels:false, powerPreference:'high-performance'},
+        physics:{default:'arcade',arcade:{debug:false}},
+        scene:[OceanScene]
+      };
+      let game = new Phaser.Game(config);
+
+      ui.start.addEventListener('click', () => {
+        gameState.captain=(ui.captainInput.value.trim()||'Kaptan').slice(0,18);
+        gameState.started=true;
+        ui.intro.style.display='none';
+        updateHUD();
+        toast('Denize hoş geldin, '+gameState.captain+'!');
+      });
+      ui.attack.addEventListener('click', () => {
+        if(!gameState.selected || !gameState.selected.active) return;
+        gameState.attacking=!gameState.attacking;
+        updateHUD();
+        if(gameState.attacking) toast('Toplar ateş ediyor!');
+      });
+      ui.repair.addEventListener('click', () => {
+        if(gameState.gold<15){toast('Tamir için 15 altın gerekiyor.');return;}
+        if(gameState.hp>=gameState.maxHp){toast('Gemi zaten sağlam.');return;}
+        gameState.gold-=15;gameState.hp=Math.min(gameState.maxHp,gameState.hp+300);updateHUD();toast('Gemi tamir edildi: +300 can');
+      });
+      ui.reset.addEventListener('click', () => {
+        gameState.gold=100;gameState.ammo=25;gameState.hp=gameState.maxHp;gameState.exp=0;gameState.level=1;gameState.maxExp=100;gameState.selected=null;gameState.attacking=false;
+        game.destroy(true);sceneRef=null;game = new Phaser.Game(config);toast('Prototip sıfırlandı.');
+      });
+    })();
+  </script>
 </body>
 </html>
