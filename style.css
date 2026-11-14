@@ -1,9 +1,22 @@
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 html, body { margin:0; width:100%; height:100%; overflow:hidden; background:#061d2b; color:#fff; font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; touch-action:none; }
-#game { position:fixed; inset:0; }
-canvas { display:block; width:100%; height:100%; }
+
+#game { 
+  position: fixed; 
+  inset: 0; 
+  width: 100%; 
+  height: 100%; 
+  z-index: 0; 
+}
+
+#game canvas { 
+  display: block; 
+  width: 100% !important; 
+  height: 100% !important; 
+}
+
 #hud { position:fixed; inset: max(10px, env(safe-area-inset-top)) 10px auto 10px; display:flex; justify-content:space-between; align-items:flex-start; gap:8px; pointer-events:none; z-index:5; }
-.panel { background:linear-gradient(145deg,rgba(5,26,39,.91),rgba(9,44,58,.78)); border:1px solid rgba(255,215,131,.38); box-shadow:0 8px 24px #00111c66; border-radius:13px; padding:10px 12px; backdrop-filter:blur(7px); }
+.panel { background:linear-gradient(145deg,rgba(5,26,39,.91),rgba(9,44,58,.78)); border:1px solid rgba(255,215,131,.38); box-shadow:0 8px 24px #00111c66; border-radius:13px; padding:10px 12px; backdrop-filter:blur(7px); pointer-events: auto; }
 .stats { width:min(245px, 60vw); }
 .brand { color:#ffd783; font-weight:900; font-size:12px; letter-spacing:.5px; margin-bottom:7px; }
 .tag { font-size:8px; border:1px solid #c58a3b; border-radius:5px; padding:2px 4px; margin-left:4px; color:#f5c97d; }
