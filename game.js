@@ -4,11 +4,11 @@
 (() => {
   const $ = id => document.getElementById(id);
   const ui = {
-    captain: $('captain'), gold: $('gold'), ammo: $('ammo'), hpText: $('hpText'),
-    hpBar: $('hpBar'), level: $('level'), expText: $('expText'), expBar: $('expBar'),
-    targetInfo: $('targetInfo'), attack: $('attackBtn'), repair: $('repairBtn'),
-    reset: $('resetBtn'), toast: $('toast'), intro: $('intro'),
-    captainInput: $('captainInput'), start: $('startBtn')
+    captain: $('captain'), gold:$('gold'), ammo: $('ammo'), hpText:$('hpText'),
+    hpBar: $('hpBar'), level:$('level'), expText: $('expText'), expBar:$('expBar'),
+    targetInfo: $('targetInfo'), attack: $('attackBtn'), repair:$('repairBtn'),
+    reset: $('resetBtn'), toast: $('toast'), intro:$('intro'),
+    captainInput: $('captainInput'), start:$('startBtn')
   };
 
   const gameState = { started:false, captain:'Kaptan', gold:100, ammo:25, hp:1000, maxHp:1000, level:1, exp:0, maxExp:100, selected:null, attacking:false };
@@ -54,18 +54,27 @@
     create() {
       sceneRef = this;
       this.cameras.main.setBackgroundColor('#0b5367');
+      
+      // Dokuları ve dünyayı sırasıyla güvenli şekilde yüklüyoruz
       this.makeTextures();
       this.drawOcean();
-      this.createWorld();
+      
+      // Oyuncu gemisini ilk sırada oluşturuyoruz
       this.player = this.add.image(0,0,'ship-player').setDepth(5).setScale(1.05);
       this.player.rotation = -Math.PI/2;
       this.player.hp = gameState.hp;
       this.player.speed = 0;
       this.player.targetPoint = null;
+
+      // Oyuncu hazır olduktan sonra dünya nesnelerini oluşturuyoruz
+      this.createWorld();
+      this.spawnTreasure(); this.spawnTreasure(); this.spawnTreasure();
+
       this.physics.world.setBounds(-1800,-1800,3600,3600);
       this.cameras.main.startFollow(this.player, true, 0.08, 0.08);
       this.cameras.main.setZoom(Math.min(1.0, Math.max(.72, window.innerWidth / 850)));
       this.cameras.main.setBounds(-1800,-1800,3600,3600);
+      
       this.input.on('pointerdown', pointer => {
         if (!gameState.started || $('intro').style.display !== 'none') return;
         const world = pointer.positionToCamera(this.cameras.main);
@@ -84,7 +93,6 @@
       this.time.addEvent({ delay:2600, loop:true, callback:() => { if (this.enemies.filter(e=>e.active).length < 5) this.spawnEnemy(); } });
       this.time.addEvent({ delay:170, loop:true, callback:() => { if (gameState.started && gameState.attacking) this.firePlayerShot(); } });
       this.time.addEvent({ delay:2400, loop:true, callback:() => this.spawnTreasure() });
-      this.spawnTreasure(); this.spawnTreasure(); this.spawnTreasure();
       this.scale.on('resize', () => this.cameras.main.setZoom(Math.min(1.0, Math.max(.72, window.innerWidth / 850))));
     }
 
@@ -214,7 +222,7 @@
       if(Phaser.Math.Distance.Between(this.player.x,this.player.y,target.x,target.y)>340) { gameState.attacking=false; updateHUD(); toast('Hedef çok uzakta'); return; }
       gameState.ammo--; updateHUD();
       this.fireShot(this.player,target,true);
-      this.particleBurst(this.player.x+Phaser.Math.Between(-22,22),this.player.y+Phaser.Math.Between(-20,20),'#ff9b45',5);
+      this.particleBurst(this.player.x+Math.random()*22-11,this.player.y+Math.random()*20-10,'#ff9b45',5);
       if(gameState.ammo<=0) { gameState.attacking=false; updateHUD(); toast('Gülle bitti!'); }
     }
 
@@ -329,12 +337,4 @@
     if(gameState.attacking) toast('Toplar ateş ediyor!');
   });
   ui.repair.addEventListener('click', () => {
-    if(gameState.gold<15){toast('Tamir için 15 altın gerekiyor.');return;}
-    if(gameState.hp>=gameState.maxHp){toast('Gemi zaten sağlam.');return;}
-    gameState.gold-=15;gameState.hp=Math.min(gameState.maxHp,gameState.hp+300);updateHUD();toast('Gemi tamir edildi: +300 can');
-  });
-  ui.reset.addEventListener('click', () => {
-    gameState.gold=100;gameState.ammo=25;gameState.hp=gameState.maxHp;gameState.exp=0;gameState.level=1;gameState.maxExp=100;gameState.selected=null;gameState.attacking=false;
-    game.destroy(true);sceneRef=null;game = new Phaser.Game(config);toast('Prototip sıfırlandı.');
-  });
-})();
+    if(gameState.gold<15){toast('Tamir için 1
