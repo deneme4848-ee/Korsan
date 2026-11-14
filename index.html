@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#061d2b">
+  <title>Korsan Dünyası — Phaser Prototip</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="game"></div>
+  <div id="hud">
+    <div class="panel stats">
+      <div class="brand">⚓ KORSAN DÜNYASI <span class="tag">PROTOTİP</span></div>
+      <div class="row"><span>Kaptan</span><strong id="captain">Kaptan</strong></div>
+      <div class="row"><span>Altın</span><strong id="gold">100</strong></div>
+      <div class="row"><span>Gülle</span><strong id="ammo">25</strong></div>
+      <div class="row"><span>Gemi canı</span><strong id="hpText">1000 / 1000</strong></div>
+      <div class="bar"><div id="hpBar"></div></div>
+      <div class="row"><span>Seviye</span><strong id="level">1</strong><span>EXP</span><strong id="expText">0 / 100</strong></div>
+      <div class="bar exp"><div id="expBar"></div></div>
+    </div>
+    <div class="panel mini-info">
+      <div id="targetInfo">Hedef: yok</div>
+      <div class="small">Denize dokun: yelken aç</div>
+      <div class="small">Düşman gemisine dokun: hedef seç</div>
+    </div>
+  </div>
+  <div id="controls">
+    <button id="attackBtn" class="action" disabled>⚔ SALDIR</button>
+    <button id="repairBtn" class="secondary">✚ TAMİR</button>
+    <button id="resetBtn" class="secondary">↻ YENİLE</button>
+  </div>
+  <div id="toast" role="status"></div>
+  <div id="intro" class="overlay">
+    <div class="modal">
+      <div class="emblem">☠</div>
+      <h1>Korsan Dünyası</h1>
+      <p>Detaylı gemilerle ilk deniz savaşı prototipin hazır.</p>
+      <label for="captainInput">Kaptan adın</label>
+      <input id="captainInput" maxlength="18" value="Kaptan" autocomplete="nickname">
+      <button id="startBtn" class="action wide">DENİZE AÇIL</button>
+      <p class="note">Bu sürüm tek cihazda çalışan bir prototiptir. Gerçek çevrim içi çok oyunculu sistem henüz ekli değildir.</p>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/phaser@3.90.0/dist/phaser.min.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>
